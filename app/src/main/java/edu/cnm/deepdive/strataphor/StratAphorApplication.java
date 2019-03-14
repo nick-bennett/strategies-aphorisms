@@ -13,7 +13,7 @@ public class StratAphorApplication extends Application {
   public void onCreate() {
     super.onCreate();
     instance = this;
-    Stetho.initializeWithDefaults(this); // Comment out this line to disable Stetho.
+    // Stetho.initializeWithDefaults(this);
     new BaseFluentAsyncTask<Void, Void, Void, Void>()
         .setPerformer((ignore) -> {
           StratAphorDatabase.getInstance().getSourceDao().findFirstById(0);
