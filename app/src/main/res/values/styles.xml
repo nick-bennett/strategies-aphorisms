@@ -8,4 +8,8 @@
     <item name="colorAccent">@color/colorAccent</item>
   </style>
 
+  <style name="PaddedText">
+    <item name="android:padding">@dimen/text_padding</item>
+  </style>
+
 </resources>

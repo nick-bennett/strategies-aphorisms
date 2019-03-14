@@ -6,6 +6,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 import edu.cnm.deepdive.strataphor.model.entity.Saying;
+import edu.cnm.deepdive.strataphor.model.pojo.SayingWithSource;
 import java.util.List;
 
 @Dao
@@ -28,6 +29,9 @@ public interface SayingDao {
 
   @Query("SELECT * FROM Saying WHERE saying_id = :sayingId")
   Saying findFirstById(long sayingId);
+
+  @Query("SELECT Saying.text as saying, Source.name as source FROM Saying INNER JOIN Source ON Source.source_id = Saying.source_id ORDER BY RANDOM() LIMIT 1")
+  SayingWithSource findFirstRandom();
 
   @Update
   int update(Saying... sayings);

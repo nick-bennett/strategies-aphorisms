@@ -1,9 +1,8 @@
 package edu.cnm.deepdive.strataphor;
 
 import android.app.Application;
-import com.facebook.stetho.Stetho;
-import edu.cnm.deepdive.android.BaseFluentAsyncTask;
 import edu.cnm.deepdive.strataphor.model.StratAphorDatabase;
+import java.util.concurrent.Executors;
 
 public class StratAphorApplication extends Application {
 
@@ -13,13 +12,8 @@ public class StratAphorApplication extends Application {
   public void onCreate() {
     super.onCreate();
     instance = this;
-    // Stetho.initializeWithDefaults(this);
-    new BaseFluentAsyncTask<Void, Void, Void, Void>()
-        .setPerformer((ignore) -> {
-          StratAphorDatabase.getInstance().getSourceDao().findFirstById(0);
-          return null;
-        })
-        .execute();
+    Executors.newSingleThreadExecutor().execute(() ->
+        StratAphorDatabase.getInstance().getSourceDao().findFirstById(0));
   }
 
   public static StratAphorApplication getInstance() {

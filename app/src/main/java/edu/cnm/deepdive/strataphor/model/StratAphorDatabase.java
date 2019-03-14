@@ -6,15 +6,13 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import edu.cnm.deepdive.android.BaseFluentAsyncTask;
+import android.util.Log;
 import edu.cnm.deepdive.strataphor.R;
 import edu.cnm.deepdive.strataphor.StratAphorApplication;
 import edu.cnm.deepdive.strataphor.model.dao.SayingDao;
 import edu.cnm.deepdive.strataphor.model.dao.SourceDao;
 import edu.cnm.deepdive.strataphor.model.entity.Saying;
 import edu.cnm.deepdive.strataphor.model.entity.Source;
-import edu.cnm.deepdive.strataphor.service.RandomSaying;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Executors;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -58,29 +57,15 @@ public abstract class StratAphorDatabase extends RoomDatabase {
     @Override
     public void onCreate(@NonNull SupportSQLiteDatabase db) {
       super.onCreate(db);
-      new PreloadTask(). execute();
-    }
-
-    @Override
-    public void onOpen(@NonNull SupportSQLiteDatabase db) {
-      super.onOpen(db);
-      StratAphorDatabase database = StratAphorDatabase.getInstance();
-      new BaseFluentAsyncTask<Void, Void, List<Saying>, List<Saying>>()
-          .setPerformer((ignore) -> database.getSayingDao().findAll())
-          .setSuccessListener((sayings) -> {
-            RandomSaying.getInstance().getSayings().addAll(sayings);
-          })
-          .execute();
+      Executors.newSingleThreadExecutor().execute(new PreloadTask());
     }
 
   }
 
-  private static class PreloadTask
-      extends BaseFluentAsyncTask<Void, Void, Void, Void> {
+  private static class PreloadTask implements Runnable {
 
-    @Nullable
     @Override
-    protected Void perform(Void... voids) throws TaskException {
+    public void run() {
       Context context = StratAphorApplication.getInstance().getApplicationContext();
       StratAphorDatabase database = StratAphorDatabase.getInstance();
       try (
@@ -97,13 +82,12 @@ public abstract class StratAphorDatabase extends RoomDatabase {
           sayings.addAll(loadSayings(sourceId, resourceName));
         }
         database.getSayingDao().insert(sayings);
-        return null;
       } catch (IOException e) {
-        throw new TaskException(e);
+        Log.e(getClass().getSimpleName(), e.toString(), e);
       }
     }
 
-    private List<Saying> loadSayings(long sourceId, String resourceName) {
+    private List<Saying> loadSayings(long sourceId, String resourceName) throws IOException {
       Context context = StratAphorApplication.getInstance().getApplicationContext();
       int resourceId =
           context.getResources().getIdentifier(resourceName, "raw", context.getPackageName());
@@ -123,16 +107,9 @@ public abstract class StratAphorDatabase extends RoomDatabase {
           }
         }
         return sayings;
-      } catch (IOException e) {
-        throw new TaskException(e);
       }
     }
 
   }
 
 }
-
-
-
-
-
