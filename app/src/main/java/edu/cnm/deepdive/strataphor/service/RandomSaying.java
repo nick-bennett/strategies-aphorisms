@@ -15,16 +15,14 @@ public class RandomSaying {
   private RandomSaying() {
     rng = new Random();
     sayings = new ArrayList<>();
-    new BaseFluentAsyncTask<Void, Void, Void, Void>()
-        .setPerformer((ignore) -> {
-          sayings.addAll(StratAphorDatabase.getInstance().getSayingDao().findAll());
-          return null;
-        })
-        .execute();
   }
 
   public static RandomSaying getInstance() {
     return InstanceHolder.INSTANCE;
+  }
+
+  public List<Saying> getSayings() {
+    return sayings;
   }
 
   public Saying getRandomSaying() {

@@ -22,14 +22,12 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity implements SensorEventListener,
     OnClickListener {
 
+  private static final int FADE_DURATION = 8000;
 
-  public static final int FADE_DURATION = 8000;
   private TextView pithySaying;
-  private Random rng = new Random();
   private float accel;
   private float accelCurrent;
   private float accelLast;
-  private View answerBackground;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +39,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     accel = 0.00f;
     accelCurrent = SensorManager.GRAVITY_EARTH;
     accelLast = SensorManager.GRAVITY_EARTH;
-    pithySaying = findViewById(R.id.pithy_saying); // Now refers to TextView, not FrameLayout.
-    answerBackground = findViewById(R.id.answer_background);
+    pithySaying = findViewById(R.id.pithy_saying);
+    View answerBackground = findViewById(R.id.answer_background);
     answerBackground.setOnClickListener(this);
   }
 
