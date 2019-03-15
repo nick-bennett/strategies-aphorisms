@@ -96,4 +96,5 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     set.playTogether(animators);
     set.start();
   }
+
 }
